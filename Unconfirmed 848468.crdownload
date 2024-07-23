@@ -1,0 +1,341 @@
+# User class
+import re
+
+
+from datetime import date
+type_list=["Student","Teacher","Rector"]
+class User:
+    def __init__(self, type, name, pass_id, email, bd, gender, nationality, phone):
+        self.set_type(type)
+        self.set_name(name)
+        self.set_pass_id(pass_id)
+        self.set_email(email)
+        self.set_birth_date(bd)
+        self.set_gender(gender)
+        self.set_nationality(nationality)
+        self.set_phone(phone)
+
+
+    def set_type(self, type):
+        if type in type_list:
+            self.__type = type
+        else:
+            raise Exception("You are not allowed to enter")
+
+    def set_name(self, name):#make sure there are at least 2 words
+        if all(not letter.isdigit() for letter in name) and len(name) >= 2:
+            self.__name = name
+        else:
+            raise ValueError("Enter your name as your passport!")
+
+    def set_pass_id(self, pass_id):
+        if (pass_id[:2].isupper() and pass_id[2:].isdigit() and len(pass_id) == 9) :
+            self.__pass_id = pass_id
+        else:
+            raise Exception("Enter your passport ID as your passport")
+
+    def set_email(self, email):
+        if (email.endswith(".com") and email.__contains__("@")):
+            self.__email = email
+        else:
+            raise ValueError("It should contains @gmail.com")
+
+    def set_birth_date(self, bd):
+        if (bd[:4].isdigit() and  bd[4] == "/" and bd[5:7].isdigit() and  bd[7] == "/" and bd[8:10].isdigit()):
+            if (int(bd[:4]) <= date.today().year and int(bd[5]) <= 1 and int(bd[6]) < 10 and int(bd[8]) <= 3 and int(bd[9]) < 10):
+                self.__bd = bd
+        else:
+            raise ValueError("Enter your birthday: YYYY/MM//DD")
+
+    def set_gender(self, gender):# make sure you try to make all your letters lowercase or upper case StudentsherzodAC2382397karomatovsherzod715@gmail.com2003/06/03maleuzbek998935082703
+        if gender == "male" or gender == "female":
+            self.__gender = gender
+        else:
+            raise ValueError("Something gets wrong!!!")
+
+    def set_nationality(self, nationality):
+        if isinstance(nationality, str):
+            self.__nationality = nationality
+        else:
+            raise ValueError("Wrong data type, enter your nationality with letters!!!")
+
+    def set_phone(self, phone):
+        if isinstance(phone, str):
+            def valid_phone(phone):
+                pattern = r'^998\d{2}-\d{3}-\d{2}-\d{2}$'
+                if re.match(pattern, phone):
+                    return True
+                else:
+                    return False
+
+    def get_type(self):
+        return self.__type
+
+    def get_name(self):
+        return self.__name
+
+    def get_pass_id(self):
+        return self.__pass_id
+
+    def get_email(self):
+        return self.__email
+
+    def get_birth_date(self):
+        return self.__bd
+
+    def get_gender(self):
+        return self.__gender
+
+    def get_nationality(self):
+        return self.__nationality
+
+    def get_phone(self):
+        return self.__phone
+
+type = input("Choose the option related to you:")
+name = input("Enter your name:")
+pass_id = input("Enter your Passport ID:")
+email = input("Enter your email:")
+bd = input("Enter your birthday date as YYYY/MM/DD:")
+gender = input("Enter your gender:")
+nationality = input("Enter your nationality:")
+phone = input("Enter your phone")
+
+user = User(type, name, pass_id, email, bd, gender, nationality, phone)
+print()
+
+
+
+
+from abc import abstractclassmethod
+class Faculty(User):
+    def __init__(self, type, name, pass_id, email, bd, gender, nationality, phone, course, occupation, hours,
+                 salary, title):
+        super().__init__(self, type, name, pass_id, email, bd, gender, nationality, phone)
+
+
+        self.set_course(course)
+        self.set_occupation(occupation)
+        self.set__hours(hours)
+        self.set__salary(salary)
+        self.set__title(title)
+
+        # open dictionary for the user here
+        # self.__titles = {"TEACHING ASSISTANTS": 1, "LECTURERS": 1.5, "SENIOR LECTURERS": 2, "ASSISTANT PROFESSOR": 2.5,
+        # "ASSOCIATE PROFESSOR": 3, "FULL PROFESSOR": 3.5, "ACADEMICIAN": 4}
+
+        self.__extra_hours = 0
+        self.__extra_salary = 0
+    @abstractclassmethod
+    def teacher(self):
+        pass
+
+    # setters
+    def set_course(self, course):  # if the course the user is entering
+        # if isinstance(course, str):
+        course = course.strip().upper()
+        f = open("courses.txt")
+        lines = f.readlines()
+        f.close()
+        for line in lines:
+            list_types = line.split()
+        if course in list_types:
+            self.__course = course
+        else:
+            raise ValueError("Invalid course entered")
+
+    def set_occupation(self, occupation):
+        occupation = occupation.strip().lower()
+        if occupation == 'full-time' or occupation == 'part-time':
+            self.__occupation = occupation
+        else:
+            raise ValueError("Invalid type of occupation entered")
+
+    def set_hours(self, hours):
+        extra_hours = 0
+        hours = hours.strip()
+        if hours.isnumeric():
+            if self.get_occupation() == 'full-time':
+                if hours > 24:
+                    raise ValueError("It's illegal")
+                elif 19 <= hours <= 24:
+                    self.__hours = 18
+                    self.__extra_hours = hours - 18
+                elif 2 <= hours <= 18:
+                    self.__hours = hours
+                    self.__extra_hours = 0
+                else:
+                    raise ValueError("You are not working at all")
+            elif self.get_occupation() == 'part-time':
+                if hours > 12:
+                    raise ValueError("It's illegal")
+                elif 10 <= hours <= 12:
+                    self.__hours = 9
+                    self.__extra_hours = hours - 9
+                elif 1 <= hours <= 9:
+                    self.__hours = hours
+                    self.__extra_hours = 0
+                else:
+                    raise ValueError("You are not working at all")
+
+    def set_title(self, title):
+        title = title.strip().upper()
+        f = open("titles.txt")
+        lines = f.readlines()
+        f.close()
+        for line in lines:
+            list_types = line.split(",")
+        if title in list_types:
+            self.__title = title
+        else:
+            raise ValueError("Invalid title entered")
+
+    def set_salary(self, salary):  # Full time  / Part time  1<hours<9
+        # the name of the dictionary should slightly be changed to something different from the parameter
+        # the salary entered by the user should be considered as base salary
+     goodthings = {"TEACHING ASSISTANTS": 100, "LECTURERS": 150, "SENIOR LECTURERS": 200, "ASSISTANT PROFESSOR": 250,
+                  "ASSOCIATE PROFESSOR": 300, "FULL PROFESSOR": 350, "ACADEMICIAN": 400}
+         # the salary which user has entered should be base salar
+
+
+     if salary.isdigit():  # isnumeric()
+        if self.get_title() in goodthings.keys():
+           self.__salary = self.get_hours() * salary[self.get_title()]
+           self.__extra_salary = self.get_extra_hours() * salary[self.get_title()] * 2  # get_extra_hours() should either be private or should not exist at all
+        else:
+          raise ValueError("salary must be numeric")
+
+    # at the very end once the latest salary has been calculated check for the occupation before returning; If the occupation is Full Time, then return the calculated salary, otherwise divide the salary by 2 and then return
+
+    # getters
+
+
+    def get_course(self):
+      return self.__course
+
+
+    def get_occupation(self):
+      return self.__occupation
+
+
+    def get_hours(self):  # course hours
+     return self.__hours
+
+
+    def get_salary(self):
+      return self.__salary
+
+
+    def get_title(self):
+     return self.__title
+
+
+salary = input('enter')
+if salary.isnumeric():
+    print('correct')
+else:
+    print('incorrect')
+class Teaching_Asstants(Faculty):
+    def __init__(self,type, name, pass_id, email, bd, gender, nationality, phone, course, occupation, hours,
+                 salary, title,department, subject, office_hours, courses_assisting, communication_skills, patience, approachability):
+     super().__init__(type, name, pass_id, email, bd, gender, nationality, phone, course, occupation, hours,
+                 salary, title)
+     self.set_department=department
+     self.set_subject=subject
+     self.set_office_hours=office_hours
+     self.set_courses_assisting=courses_assisting
+     self.set_communication_skills=communication_skills
+     self.set_patience=patience
+     self.set_approchability=approachability
+    def teacher(self):
+        print()
+    def set_subject(self,subject):
+        self.__subject=subject
+    def  set_office_hours(self,office_hours):
+        self.__office_hours=office_hours
+    def set_courses_assisting(self,courses_assisting):
+        self.__courses_assisting=courses_assisting
+    def set_communication_skills(self,communication_skills):
+        self.__communication_skills=communication_skills
+    def set_patience(self,patience):
+        self.__patience=patience
+    def set_approchability(self,approchability):
+        self.__approchability=approchability
+
+    def get_subject(self):
+        return self.__subject
+
+    def get_office_hours(self):
+        return self.__office_hours
+
+    def get_courses_assisting(self):
+        return self.__courses_assisting
+
+    def get_communication_skills(self):
+        return self.__communication_skills
+
+    def get_patience(self):
+        return self.__patience
+
+    def get_approachability(self):
+        return self.__approachability
+class Lecturers(Teaching_Asstants):
+    def __init__(self,type, name, pass_id, email, bd, gender, nationality, phone, course, occupation, hours,
+                 salary, title,department, subject, office_hours, courses_assisting, communication_skills, patience, approachability):
+        super().__init__(type, name, pass_id, email, bd, gender, nationality, phone, course, occupation, hours,
+                 salary, title,department, subject, office_hours, courses_assisting, communication_skills, patience, approachability)
+    def teacher(self):
+        print()
+class Senior_Lecturers(Lecturers):
+    def __init__(self,type, name, pass_id, email, bd, gender, nationality, phone, course, occupation, hours,
+                 salary, title,department, subject, office_hours, courses_assisting, communication_skills, patience, approachability):
+        super().__init__(type, name, pass_id, email, bd, gender, nationality, phone, course, occupation, hours,
+                 salary, title,department, subject, office_hours, courses_assisting, communication_skills, patience, approachability)
+    def teacher(self):
+        print()
+class Assistant_Professor(Senior_Lecturers):
+    def __init__(self, type, name, pass_id, email, bd, gender, nationality, phone, course, occupation, hours,
+                 salary, title, department, subject, office_hours, courses_assisting, communication_skills, patience,
+                 approachability):
+        super().__init__(type, name, pass_id, email, bd, gender, nationality, phone, course, occupation, hours,
+                         salary, title, department, subject, office_hours, courses_assisting, communication_skills,
+                         patience, approachability)
+
+    def teacher(self):
+        print()
+class Associate_Pr(Assistant_Professor):
+    def __init__(self, type, name, pass_id, email, bd, gender, nationality, phone, course, occupation, hours,
+                 salary, title, department, subject, office_hours, courses_assisting, communication_skills, patience,
+                 approachability):
+        super().__init__(type, name, pass_id, email, bd, gender, nationality, phone, course, occupation, hours,
+                         salary, title, department, subject, office_hours, courses_assisting, communication_skills,
+                         patience, approachability)
+
+    def teacher(self):
+        print()
+class Full_Researchers(Associate_Pr):
+    def __init__(self, type, name, pass_id, email, bd, gender, nationality, phone, course, occupation, hours,
+                 salary, title, department, subject, office_hours, courses_assisting, communication_skills, patience,
+                 approachability):
+        super().__init__(type, name, pass_id, email, bd, gender, nationality, phone, course, occupation, hours,
+                         salary, title, department, subject, office_hours, courses_assisting, communication_skills,
+                         patience, approachability)
+
+    def teacher(self):
+
+        print()
+
+class Pr_Academic(Associate_Pr):
+    def __init__(self, type, name, pass_id, email, bd, gender, nationality, phone, course, occupation, hours,
+                 salary, title, department, subject, office_hours, courses_assisting, communication_skills, patience,
+                 approachability):
+        super().__init__(type, name, pass_id, email, bd, gender, nationality, phone, course, occupation, hours,
+                         salary, title, department, subject, office_hours, courses_assisting, communication_skills,
+                         patience, approachability)
+
+    def teacher(self):
+        print()
+
+
+
+
